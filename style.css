@@ -21,6 +21,7 @@ body.dark-mode {
     --card-bg: #2D2D44;
     --card-shadow: rgba(0, 0, 0, 0.2);
     --header-grad: linear-gradient(135deg, #1A1A2E 0%, #2D2D44 100%);
+    --plyr-color-main: #90CAF9; /* Diperbarui untuk mode gelap */
 }
 
 * {
@@ -330,17 +331,22 @@ body.dark-mode .episode-card:hover { background: #3D3D54; }
     gap: 10px;
 }
 
-/* Player Page */
+/* ==================================== */
+/* 🚀 PERBAIKAN TOTAL: PLAYER PAGE 🚀 */
+/* ==================================== */
+
 .player-page-container {
     background: #000;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    justify-content: center;
+    /* Ubah agar konten informasi episode bisa diletakkan di bawah player */
+    justify-content: flex-start;
 }
 
+/* 1. Header di atas Video */
 .player-header {
-    padding: 20px 20px 15px;
+    padding: 15px 20px;
     display: flex;
     align-items: center;
     position: absolute;
@@ -348,50 +354,153 @@ body.dark-mode .episode-card:hover { background: #3D3D54; }
     left: 0;
     right: 0;
     z-index: 10;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+    /* Gradien yang lebih gelap dan halus */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
 }
 .player-back-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.15); /* Tombol bulat semi-transparan */
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+.player-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 .player-title {
     color: white;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     margin-left: 15px;
+    flex-grow: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* 2. Area Video (Player Container) */
 .player-container {
     width: 100%;
+    /* Menggunakan rasio aspek 16:9 agar video responsif */
+    padding-top: 56.25%; /* 9 / 16 * 100% */
+    position: relative;
+    z-index: 5;
+}
+/* Memastikan elemen video/plyr terisi penuh */
+.player-container > * { /* Targetkan elemen player (misalnya div untuk plyr) */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* 3. Konten Informasi di Bawah Video */
+.player-content-info {
     flex-grow: 1;
-    display: flex;
-    align-items: center;
+    background-color: var(--primary-bg); /* Menggunakan warna latar belakang aplikasi */
+    color: var(--primary-text);
+    padding: 20px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto; /* Tengah */
 }
+
+/* Detail Episode Saat Ini */
+.episode-info {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--secondary-bg);
+}
+.episode-info-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+.episode-info-anime {
+    font-size: 14px;
+    color: var(--secondary-text);
+    font-weight: 500;
+}
+
+
+/* Daftar Episode (Pengganti .player-controls) */
 .player-controls {
-    padding: 15px;
+    padding: 0; /* Hapus padding yang tidak perlu */
 }
-.player-controls .section-title { color: white; }
+.player-controls .section-title {
+    color: var(--primary-text);
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+.episode-list-horizontal {
+    display: flex;
+    overflow-x: auto; /* Gulir horizontal untuk episode */
+    gap: 10px;
+    padding-bottom: 10px;
+    /* Sembunyikan scrollbar di Webkit */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+.episode-list-horizontal::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+.episode-list-horizontal .episode-card {
+    min-width: 120px;
+    text-align: center;
+    background: var(--secondary-bg);
+    padding: 10px;
+    border-radius: 12px;
+    transition: transform 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+.episode-list-horizontal .episode-card.active {
+    background: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+.episode-list-horizontal .episode-card.active .episode-name {
+    color: white;
+}
+.episode-list-horizontal .episode-card:hover {
+    transform: translateY(-3px);
+    background: #BBDEFB;
+}
+body.dark-mode .episode-list-horizontal .episode-card:hover { background: #3D3D54; }
 
 .download-links-btn {
     display: block;
     width: 100%;
     text-align: center;
-    padding: 12px;
+    padding: 14px; /* Sedikit lebih besar */
     background: var(--accent-color);
     color: white;
     border: none;
-    border-radius: 8px;
-    margin-top: 20px;
+    border-radius: 10px; /* Lebih membulat */
+    margin-top: 25px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.download-links-btn:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
 }
 
+
+/* ==================================== */
+/* ⛔ BAGIAN LAIN TIDAK BERUBAH ⛔ */
+/* ==================================== */
 
 /* Bottom Navigation */
 .bottom-nav {
