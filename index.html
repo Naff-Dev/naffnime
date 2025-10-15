@@ -645,7 +645,10 @@
                     
                     if (pageId === 'completePage') {
                         loadCompletePage(1);
-                    } else {
+                    } else if (pageId === 'homePage') {
+                        loadHomePage();
+                    }
+                    else {
                          changePage(pageId);
                     }
                 });
@@ -679,7 +682,7 @@
 
         function goBack() {
             if (pageHistory.length > 1) {
-                const currentPage = pageHistory.pop();
+                pageHistory.pop();
                 const previousPageId = pageHistory[pageHistory.length - 1];
 
                 // Update active nav item
@@ -687,6 +690,10 @@
                 if(navItem) {
                     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                     navItem.classList.add('active');
+                } else {
+                     // Fallback for pages not in nav (like detail page)
+                     const homeNav = document.querySelector('.nav-item[data-page="homePage"]');
+                     if(homeNav) homeNav.classList.add('active');
                 }
 
                 changePage(previousPageId, false); // false to not add to history again
@@ -696,6 +703,17 @@
         function changePage(pageId, addToHistory = true) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
+            const appContainer = document.getElementById('appContainer');
+            const bottomNav = document.querySelector('.bottom-nav');
+
+            if (pageId === 'playerPage') {
+                appContainer.style.paddingBottom = '0';
+                bottomNav.style.display = 'none';
+            } else {
+                appContainer.style.paddingBottom = '80px';
+                bottomNav.style.display = 'flex';
+            }
+
             if(targetPage) {
                 targetPage.classList.add('active');
                 if (addToHistory && pageHistory[pageHistory.length - 1] !== pageId) {
@@ -772,11 +790,15 @@
             const paginationContainer = document.getElementById('genrePagination');
             
             const { data, pagination } = await fetchData(`genres/${slug}/${page}`);
+            // The API for genres might have the pagination object inside the data object
+            const paginationInfo = pagination || (data ? data.pagination : null);
+
             if(data && data.anime && data.anime.length > 0) {
                 renderAnimeGrid(grid, data.anime, 'genre');
-                renderPagination(paginationContainer, pagination, (newPage) => loadAnimeByGenre(slug, name, newPage));
+                renderPagination(paginationContainer, paginationInfo, (newPage) => loadAnimeByGenre(slug, name, newPage));
             } else {
                 grid.innerHTML = `<div class="loader">No anime found in this genre.</div>`;
+                paginationContainer.innerHTML = '';
             }
         }
         
@@ -792,6 +814,7 @@
                 renderPagination(paginationContainer, pagination, loadOngoingListPage);
             } else {
                 grid.innerHTML = `<div class="loader">Failed to load ongoing anime.</div>`;
+                paginationContainer.innerHTML = '';
             }
         }
         
@@ -807,6 +830,7 @@
                 renderPagination(paginationContainer, pagination, loadCompletePage);
             } else {
                 grid.innerHTML = `<div class="loader">Failed to load complete anime.</div>`;
+                 paginationContainer.innerHTML = '';
             }
         }
 
@@ -960,28 +984,52 @@
             container.appendChild(prevBtn);
 
             // Page Number Buttons
-            // Simple logic for now, can be improved for many pages
-            for (let i = 1; i <= last_visible_page; i++) {
-                 // Logic to show only a limited number of pages if there are too many
-                if (last_visible_page > 7 && (i > 2 && i < current_page - 1) || (i < last_visible_page - 1 && i > current_page + 1)) {
-                    if (i === 3 || i === last_visible_page - 2) {
-                        const dots = document.createElement('span');
-                        dots.textContent = '...';
-                        dots.style.color = 'var(--secondary-text)';
-                        dots.style.alignSelf = 'flex-end';
-                        container.appendChild(dots);
-                    }
-                    continue;
+            const pagesToShow = [];
+            if (last_visible_page <= 7) {
+                for (let i = 1; i <= last_visible_page; i++) {
+                    pagesToShow.push(i);
                 }
-
-                const pageBtn = document.createElement('button');
-                pageBtn.textContent = i;
-                if (i === current_page) {
-                    pageBtn.classList.add('active');
+            } else {
+                pagesToShow.push(1);
+                if (current_page > 3) {
+                    pagesToShow.push('...');
                 }
-                pageBtn.onclick = () => pageClickCallback(i);
-                container.appendChild(pageBtn);
+                if (current_page > 2) {
+                    pagesToShow.push(current_page - 1);
+                }
+                if (current_page !== 1 && current_page !== last_visible_page) {
+                    pagesToShow.push(current_page);
+                }
+                if (current_page < last_visible_page - 1) {
+                    pagesToShow.push(current_page + 1);
+                }
+                if (current_page < last_visible_page - 2) {
+                    pagesToShow.push('...');
+                }
+                pagesToShow.push(last_visible_page);
             }
+
+            const uniquePages = [...new Set(pagesToShow)];
+
+            uniquePages.forEach(page => {
+                 if (page === '...') {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    dots.style.color = 'var(--secondary-text)';
+                    dots.style.alignSelf = 'center';
+                    dots.style.padding = '0 5px';
+                    container.appendChild(dots);
+                } else {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = page;
+                    if (page === current_page) {
+                        pageBtn.classList.add('active');
+                    }
+                    pageBtn.onclick = () => pageClickCallback(page);
+                    container.appendChild(pageBtn);
+                }
+            });
+
 
             // Next Button
             const nextBtn = document.createElement('button');
