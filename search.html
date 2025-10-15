@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAFFDEV-NIME - Search</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body id="search-page">
+    <div class="app-container">
+        <div class="header">
+            <button class="theme-toggle">🌙</button>
+            <div class="logo">Search</div>
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search anime...">
+            </div>
+        </div>
+        <div class="content">
+            <div class="anime-grid" id="searchResultsGrid"><div class="loader">Enter a query to search.</div></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item" data-page="homePage">
+            <span style="font-size: 20px;">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="search.html" class="nav-item active" data-page="searchPage">
+            <span style="font-size: 20px;">🔍</span>
+            <span class="nav-label">Search</span>
+        </a>
+        <a href="complete.html" class="nav-item" data-page="completePage">
+            <span style="font-size: 20px;">✅</span>
+            <span class="nav-label">Complete</span>
+        </a>
+        <a href="genres.html" class="nav-item" data-page="genresPage">
+            <span style="font-size: 20px;">📚</span>
+            <span class="nav-label">Genres</span>
+        </a>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
